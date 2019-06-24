@@ -71,7 +71,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 //		}
 		
 		$title=wp_title('',0);
-		$host=preg_replace('/(^https?:\/\/|\/$)/','',site_url('/'));
+		$host=preg_replace('/(^https?:\/\/|\/$)/','',home_url('/')); // RAZ WAS site_url('/')!
 		if(empty($title)){
 			$title=$host;
 		}
@@ -209,8 +209,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				},
 				$endpointName
 			);
-			$endpointName = str_replace(site_url(), '',rest_url($endpointName));
-			$endpointName = str_replace($basePath, '',$endpointName);
+			//$endpointName = str_replace(site_url(), '',rest_url($endpointName)); // COMMENTED BY RAZ
+			//$endpointName = str_replace($basePath, '',$endpointName); // COMMENTED BY RAZ
 			
 			if(empty($swagger['paths'][$endpointName])){
 				$swagger['paths'][$endpointName] = array();
@@ -248,7 +248,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						if(!empty($pdetails['type'])){
 							if($pdetails['type']=='array'){
 								$parameter['type']=$pdetails['type'];
-								$parameter['items']=array('type'=>'string');
+								//$parameter['items']=array('type'=>'string'); // RAZ: commented
+								if( !isset($pdetails['items']) ) // RAZ: added
+									$parameter['items']=array('type'=>'string'); // RAZ: added
+								else  // RAZ: added
+									$parameter['items'] = $pdetails['items']; // RAZ: added
 							}elseif($pdetails['type']=='object'){
 								$parameter['type']='string';
 							
@@ -344,7 +348,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 			
 			if($prop['type']=='array'){
-				$prop['items']=array('type'=>'string');
+				//$prop['items']=array('type'=>'string'); // RAZ: commented
+				if( empty($prop['items']) ) // RAZ: added
+					$prop['items']=array('type'=>'string'); // RAZ: added
 			}else			
 			if($prop['type']=='date-time'){
 				$prop['type']='string';
